@@ -35,24 +35,9 @@ configure()
 	a2enmod "$moduleName" &> /dev/null
 }
 
-update()
-{
-	rm -f "/usr/lib/apache2/modules/$moduleName.so"
-	rm -f "/etc/apache2/mods-available/$moduleName.conf"
-	rm -f "/etc/apache2/mods-available/$moduleName.load"
-	
-	cp -f "$moduleName.so" "/usr/lib/apache2/modules/$moduleName.so"
-	cp -f "$moduleName.conf" "/etc/apache2/mods-available/$moduleName.conf"
-	cp -f "$moduleName.load" "/etc/apache2/mods-available/$moduleName.load"
-
-	a2enmod "$moduleName" &> /dev/null
-}
-
 restart()
 {
 	systemctl restart apache2
 }
-
-##cleanAll && compile && link && clean && update && restart
 
 cleanAll && compile && link && clean && configure && restart
