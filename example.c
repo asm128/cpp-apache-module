@@ -6,26 +6,26 @@
 
 int HTTPRequestHandler(request_rec *reqrec)
 {
-    if (!reqrec->handler || strcmp(reqrec->handler, "example"))
-    {
-        return DECLINED;
+	if ( !reqrec->handler || strcmp(reqrec->handler, "example") )
+	{
+		return DECLINED;
 	}
 
-	if (reqrec->method_number != M_GET)
+	if ( reqrec->method_number != M_GET ) 
 	{
-        return HTTP_METHOD_NOT_ALLOWED;
+		return HTTP_METHOD_NOT_ALLOWED;
 	}
-        
+
 	apr_uuid_t uuid;
 	apr_uuid_get(&uuid);
-	
+
 	char buff[APR_UUID_FORMATTED_LENGTH + 1];
 	apr_uuid_format(&buff[0],&uuid);
-	
-    ap_set_content_type(reqrec, "text/html; charset=utf-8");
-    ap_rprintf(reqrec, "C++ Apache Module: %s", buff );
-    
-    return OK;
+
+	ap_set_content_type(reqrec, "text/html; charset=utf-8");
+	ap_rprintf(reqrec, "C++ Apache Module: %s", buff );
+
+	return OK;
 }
 
 void registerModuleHook(apr_pool_t *pool)
