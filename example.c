@@ -1,50 +1,45 @@
 #include <httpd.h>
 #include <http_protocol.h>
 #include <http_config.h>
+#include <apr_uuid.h>
 
-// handler del modulo
-int myapmodHandler(request_rec *reqrec)
+
+int HTTPRequestHandler(request_rec *reqrec)
 {
-    // test handler
-    if (! reqrec->handler || strcmp(reqrec->handler, "example"))
+    if (!reqrec->handler || strcmp(reqrec->handler, "example"))
+    {
         return DECLINED;
+	}
 
-    // test metodo http
-    if (reqrec->method_number != M_GET)
+	if (reqrec->method_number != M_GET)
+	{
         return HTTP_METHOD_NOT_ALLOWED;
-
-    // html output
-    ap_set_content_type(reqrec, "text/html;charset=ascii");
-    ap_rputs("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n", 
-                        reqrec);
-    ap_rputs("<html>",  reqrec);
-    ap_rputs("<head>",  reqrec);
-    ap_rputs("<title>It Works!</title>", reqrec);
-    ap_rputs("</head>", reqrec);
-    ap_rputs("<body>",  reqrec);
-    ap_rputs("<h1>C++ Apache Module</h1>", 
-                        reqrec);
-    ap_rputs("</body>", reqrec);
-    ap_rputs("</html>", reqrec);
-
-    // salgo con OK
+	}
+        
+	apr_uuid_t uuid;
+	apr_uuid_get(&uuid);
+	
+	char buff[APR_UUID_FORMATTED_LENGTH + 1];
+	apr_uuid_format(&buff[0],&uuid);
+	
+    ap_set_content_type(reqrec, "text/html; charset=utf-8");
+    ap_rprintf(reqrec, "C++ Apache Module: %s", buff );
+    
     return OK;
 }
 
-// register hooks del modulo
-void myapmodHooks(apr_pool_t *pool)
+void registerModuleHook(apr_pool_t *pool)
 {
-    // set hook handler
-    ap_hook_handler(myapmodHandler, NULL, NULL, APR_HOOK_LAST);
+	ap_hook_handler(HTTPRequestHandler, NULL, NULL, APR_HOOK_LAST);
 }
 
-// estructura global del modulo
-module AP_MODULE_DECLARE_DATA example = {
+module example = 
+{
     STANDARD20_MODULE_STUFF,
     NULL,
     NULL,
     NULL,
     NULL,
     NULL,
-    myapmodHooks
+    registerModuleHook
 };
